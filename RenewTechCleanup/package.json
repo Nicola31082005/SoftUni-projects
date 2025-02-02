@@ -1,0 +1,23 @@
+{
+  "name": "renewtech-cleanup",
+  "version": "1.0.0",
+  "description": "RenewTech Cleanup Single Page Application",
+  "main": "index.html",
+  "scripts": {
+    "test": "mocha tests",
+    "dev": "lite-server"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "lit-html": "^3.2.1",
+    "page": "1.11.6"
+  },
+  "devDependencies": {
+    "chai": "4.3.4",
+    "lite-server": "^2.6.1",
+    "mocha": "8.3.2",
+    "playwright-chromium": "1.9.2",
+    "server": "^1.0.41"
+  }
+}
