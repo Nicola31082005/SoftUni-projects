@@ -36,6 +36,22 @@ export default {
         const result = response.json();
 
         return result;
+    },
+    async update(userId, userData) {
+        const postData = transformUserData(userData);
+        postData._id = userId;
+
+        const response = await fetch(`${URL}/${userId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(postData)
+        });
+
+        const result = await response.json();
+
+        return result;
     }
 }
 
