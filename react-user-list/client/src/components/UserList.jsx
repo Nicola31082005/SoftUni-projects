@@ -3,11 +3,13 @@ import SearchBar from "./SearchBar";
 import UserListItem from "./UserListItem";
 import userService from "../services/userService";
 import UserCreate from "./UserCreate";
+import UserInfo from "./UserInfo";
 
 export default function UserList() {
 
-    const [users, setUsers] = useState([])
-    const [showCreate, setShowCreate] = useState(null)
+    const [users, setUsers] = useState([]);
+    const [showCreate, setShowCreate] = useState(null);
+    const [showInfo, setShowInfo] = useState(undefined); // Save userId in the showInfo state
 
     useEffect(() => {
         userService.getAll()
@@ -40,6 +42,13 @@ export default function UserList() {
 
     }
 
+    const userInfoClickHandler = (userId) => {
+        setShowInfo(userId)
+    }
+
+    const userInfoCloseClickHandler = () => {
+        setShowInfo(undefined)
+    }
 
 
     return (
@@ -51,6 +60,13 @@ export default function UserList() {
                 <UserCreate
                     onClose={closeUserClickHandler}
                     onSave={saveUserClickHandler}
+                />
+            )}
+
+            {showInfo && (
+                <UserInfo
+                    userId={showInfo}
+                    onClose={userInfoCloseClickHandler}
                 />
             )}
 
@@ -185,7 +201,11 @@ export default function UserList() {
                     </thead>
                     <tbody>
                         {users.map(
-                            (user) => <UserListItem {...user} key={user._id} />
+                            (user) => <UserListItem
+                                {...user}
+                                key={user._id}
+                                onInfoClick={userInfoClickHandler}
+                            />
                         )}
                     </tbody>
                 </table>
