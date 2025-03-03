@@ -4,12 +4,15 @@ import UserListItem from "./UserListItem";
 import userService from "../services/userService";
 import UserCreate from "./UserCreate";
 import UserInfo from "./UserInfo";
+import DeleteUser from "./DeleteUser";
 
 export default function UserList() {
 
     const [users, setUsers] = useState([]);
     const [showCreate, setShowCreate] = useState(null);
     const [showInfo, setShowInfo] = useState(undefined); // Save userId in the showInfo state
+    const [showDelete, setShowDelete] = useState(undefined); // Save userId in the showDelete state
+
 
     useEffect(() => {
         userService.getAll()
@@ -50,6 +53,27 @@ export default function UserList() {
         setShowInfo(undefined)
     }
 
+    const deleteUserClickHandler = (userId) => {
+        setShowDelete(userId);
+    }
+
+    const deleteUserCloseClickHandler = () => {
+        setShowDelete(undefined);
+    }
+
+    const deleteUserHandler = async () => {
+        const userId = showDelete;
+
+        // Delete user in the server
+        const result = await userService.deleteUser(userId);
+
+        // Delete user in the UI
+        setUsers((users) => users.filter(user => user._id !== userId))
+
+        // Close the modal
+        setShowDelete(undefined);
+
+    }
 
     return (
         <section className="card users-container">
@@ -67,6 +91,14 @@ export default function UserList() {
                 <UserInfo
                     userId={showInfo}
                     onClose={userInfoCloseClickHandler}
+                />
+            )}
+
+            {showDelete && (
+                <DeleteUser
+                    userId={showDelete}
+                    onClose={deleteUserCloseClickHandler}
+                    onClick={deleteUserHandler}
                 />
             )}
 
@@ -205,6 +237,7 @@ export default function UserList() {
                                 {...user}
                                 key={user._id}
                                 onInfoClick={userInfoClickHandler}
+                                onDeleteClick={deleteUserClickHandler}
                             />
                         )}
                     </tbody>

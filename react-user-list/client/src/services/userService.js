@@ -28,6 +28,14 @@ export default {
         const result = respone.json()
 
         return result;
+    },
+    async deleteUser(userId) {
+        const response = await fetch(`${URL}/${userId}`, {
+            method: "DELETE"
+        })
+        const result = response.json();
+
+        return result;
     }
 }
 
