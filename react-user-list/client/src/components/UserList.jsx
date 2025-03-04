@@ -5,6 +5,7 @@ import userService from "../services/userService";
 import UserCreate from "./UserCreate";
 import UserInfo from "./UserInfo";
 import DeleteUser from "./DeleteUser";
+import Pagination from "./Pagination";
 
 export default function UserList() {
 
@@ -13,12 +14,20 @@ export default function UserList() {
     const [showInfo, setShowInfo] = useState(undefined); // Save userId in the showInfo state
     const [showDelete, setShowDelete] = useState(undefined); // Save userId in the showDelete state
     const [showEdit, setShowEdit] = useState(undefined); // Save userId in the showEdit state
+    const [showDisplayUsers, setShowDisplayUsers] = useState([]) // Save users for the pagination
+    const [currentPage, setCurrentPage] = useState(1); // Track the current Page
+    const [usersPerPage, setUsersPerPage] = useState(0) // Save the current users per page
 
 
     useEffect(() => {
-        userService.getAll()
-            .then((result) => setUsers(result))
-    }, [])
+        userService.getAll().then((result) => {
+            setUsers(result);
+            setShowDisplayUsers(result.slice(0, 5)); // Update displayed users after fetching
+        });
+
+        setUsersPerPage(5);
+    }, []);
+
 
     const createUserClickHandler = (userId) => {
         setShowCreate(true)
@@ -83,7 +92,6 @@ export default function UserList() {
         setShowCreate(true);
     }
 
-
     const userEditHandler = async (e) => {
         e.preventDefault();
 
@@ -102,6 +110,42 @@ export default function UserList() {
         setShowCreate(null);
         setShowEdit(undefined);
     }
+
+    const modifyDisplayUsers = (value) => {
+        const usersPerPage = Number(value);
+        setUsersPerPage(usersPerPage);
+
+
+
+        const startIndex = (currentPage - 1) * usersPerPage;
+        const endIndex = startIndex + usersPerPage;
+
+        const modifiedUsers = users.slice(startIndex, endIndex)
+
+        setShowDisplayUsers(modifiedUsers)
+    }
+
+    const goToNextPage = () => {
+        const totalPages = Math.ceil(users.length / usersPerPage)
+
+        setCurrentPage((prevPage) => Math.min(prevPage + 1, totalPages))
+    };
+
+    const goToPreviousPage = () => {
+        setCurrentPage((prevPage) => Math.max(prevPage - 1, 1)); // Ensure it doesn't go below 1
+
+    };
+
+    const goToFirstPage = () => {
+        setCurrentPage(1);
+    }
+
+    const goToLastPage = () => {
+        const totalPages = Math.ceil(users.length / usersPerPage)
+        setCurrentPage(totalPages)
+    }
+
+
 
     return (
         <section className="card users-container">
@@ -263,7 +307,7 @@ export default function UserList() {
                         </tr>
                     </thead>
                     <tbody>
-                        {users.map(
+                        {showDisplayUsers.map(
                             (user) => <UserListItem
                                 {...user}
                                 key={user._id}
@@ -279,6 +323,16 @@ export default function UserList() {
             {/* <!-- New user button  --> */}
             <button onClick={createUserClickHandler} className="btn-add btn">Add new user</button>
 
+            {/* Pagination */}
+            <Pagination
+                modifyDisplayUsers={modifyDisplayUsers}
+                currentPage={currentPage}
+                nextPage={goToNextPage}
+                previousPage={goToPreviousPage}
+                firstPage={goToFirstPage}
+                lastPage={goToLastPage}
+                totalPages={Math.ceil(users.length / usersPerPage)}
+            />
 
         </section>
     )
